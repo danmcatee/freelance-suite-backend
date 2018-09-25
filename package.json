@@ -1,0 +1,24 @@
+{
+  "name": "freelance-suite-backend",
+  "version": "1.0.0",
+  "description": "Backend for the Freelance Suite",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodeSocialLeipzig/freelance-suite-backend.git"
+  },
+  "author": "CodeSocial",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CodeSocialLeipzig/freelance-suite-backend/issues"
+  },
+  "homepage": "https://github.com/CodeSocialLeipzig/freelance-suite-backend#readme",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "mongoose": "^5.2.15"
+  }
+}
