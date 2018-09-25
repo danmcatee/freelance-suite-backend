@@ -64,11 +64,9 @@ router.patch('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
     let id = req.params.id
 
-
-
     User.deleteOne({ _id: id }, (err) => {
         if (err) {
-            console.log('Error while saving user: ' + JSON.stringify(newUser))
+            console.log('Error while deleting user with ID ' +id)
             console.log(err)
             res.status(500).send('Error while deleting user')
         } else {
