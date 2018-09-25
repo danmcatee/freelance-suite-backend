@@ -4,7 +4,8 @@ const mongoose = require('mongoose')
 const index = require('./routes/index')
 const user = require('./routes/user')
 
-mongoose.connect('mongodb://127.0.0.1:27017/freelance-suite-db', { useNewUrlParser: true })
+// ### Insert personal DB username and password ###
+mongoose.connect('mongodb://<dbuser>:<dbpassword>@ds215093.mlab.com:15093/freelance-suite-db', { useNewUrlParser: true })
 // Get Mongoose to use the global promise library
 mongoose.Promise = global.Promise
 //Get the default connection
