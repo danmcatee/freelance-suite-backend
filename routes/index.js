@@ -3,7 +3,7 @@ const router = express.Router()
 
 // zum Testen
 router.get('/', (req, res) => {
-    res.status(200).json({'msg': 'hello world'})
+  res.status(200).json({ 'msg': 'hello world' })
 })
 
 
