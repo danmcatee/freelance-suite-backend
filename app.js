@@ -1,11 +1,11 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
-const projectProps = require('./utils/project-properties.json');
+const projectProps = require('./utils/project-properties.json')
 const indexRoute = require('./routes/index')
 const userRoute = require('./routes/user')
 
-let dbCon = projectProps.databaseConnection;
+let dbCon = projectProps.databaseConnection
 mongoose.connect(`mongodb://${dbCon.username}:${dbCon.password}@${dbCon.uri}`, { useNewUrlParser: true })
 // Get Mongoose to use the global promise library
 mongoose.Promise = global.Promise
