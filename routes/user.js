@@ -2,9 +2,6 @@ const express = require('express')
 const userController = require('../controllers/user-controller')
 const router = express.Router()
 
-// middleware function that logs path and time of request
-router.use(userController.logRequest)
-
 // get all users
 router.get('/', userController.getAllUsers)
 
