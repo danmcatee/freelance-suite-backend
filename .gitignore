@@ -1,0 +1,8 @@
+# Dependency directories
+node_modules/
+
+# Properties file
+utils/project-properties.json
+
+# For playing around with new features
+playground/
