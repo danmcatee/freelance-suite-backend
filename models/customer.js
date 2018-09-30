@@ -8,11 +8,13 @@ const CustomerSchema = new Schema({
   modifiedOn: Date,
   email: String,
   phone: String,
-  address: {
+  address: { // TODO separate schema
     street: String,
     houseNo: String,
+    additionalInfo: String,
     postalCode: String,
     town: String,
+    state: String,
     country: String
   }
 })
