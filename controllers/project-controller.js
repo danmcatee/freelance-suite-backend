@@ -1,7 +1,7 @@
 const Project = require('../models/project')
 
-exports.getAllProjects = (req, res) => {
-  Project.find().exec((err, projects) => {
+exports.getProjects = (req, res) => {
+  Project.find(req.query).exec((err, projects) => {
     if (err) {
       console.log(err)
       res.status(400).send('Error while getting projects')

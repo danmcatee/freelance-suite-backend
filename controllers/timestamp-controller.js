@@ -1,7 +1,7 @@
 const Timestamp = require('../models/timestamp')
 
-exports.getAllTimestamps = (req, res) => {
-  Timestamp.find().exec((err, timestamps) => {
+exports.getTimestamps = (req, res) => {
+  Timestamp.find(req.query).exec((err, timestamps) => {
     if (err) {
       console.log(err)
       res.status(400).send('Error while getting timestamps')

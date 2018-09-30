@@ -1,7 +1,7 @@
 const Task = require('../models/task')
 
-exports.getAllTasks = (req, res) => {
-  Task.find().exec((err, tasks) => {
+exports.getTasks = (req, res) => {
+  Task.find(req.query).exec((err, tasks) => {
     if (err) {
       console.log(err)
       res.status(400).send('Error while getting tasks')
