@@ -1,4 +1,4 @@
 exports.logRequest = (req, res, next) => {
-  console.log('Incomming request to ' + req.originalUrl + ' on ' + new Date())
+  console.log(new Date() + ': request to ' + req.originalUrl)
   next()
 }

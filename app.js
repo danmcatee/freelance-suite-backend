@@ -25,12 +25,14 @@ app.use(bodyParser.urlencoded({ extended: true }))
 // parse requests of content-type - application/json
 app.use(bodyParser.json())
 
+app.use('/*', middleware.logRequest)
 app.use('/', indexRoute)
 app.use('/api/user', userRoute)
 app.use('/api/customer', customerRoute)
 app.use('/api/project', projectRoute)
 app.use('/api/task', taskRoute)
 app.use('/api/timestamp', timestampRoute)
+
 
 // listen for requests
 app.listen(port, () => {
