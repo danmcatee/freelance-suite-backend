@@ -1,7 +1,0 @@
-{
-  "databaseConnection" : {
-    "uri" : "ds215093.mlab.com:15093/freelance-suite-db",
-    "username" : "juri",
-    "password" : "freelance7"
-  }
-}
