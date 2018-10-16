@@ -4,7 +4,7 @@ exports.getAllUsers = (req, res) => {
   User.find().exec((err, users) => {
     if (err) {
       console.log(err)
-      res.status(400).send('Error while getting users')
+      res.status(500).json({error: err.message})
     } else {
       res.status(200).json(users)
     }
@@ -18,10 +18,13 @@ exports.getUser = (req, res) => {
   User.findOne({ _id: id }, (err, user) => {
     if (err) {
       console.log(err)
-      res.status(400).send('Error while trying to get user with ID ' + id)
-    }
-    if (user == null) {
-      res.status(404).send('User with ID ' + id + ' not found.')
+      if(err.name === 'CastError') {
+        res.status(400).json({error: 'ID ' + id + ' has wrong format'})
+      } else {
+        res.status(500).json({error: err.message})
+      }
+    } else if (user == null) {
+      res.status(404).json({error: 'User with ID ' + id + ' not found.'})
     } else {
       res.status(200).json(user)
     }
@@ -35,7 +38,7 @@ exports.registerUser = (req, res) => {
     if (err) {
       console.log('Error while saving user: ' + JSON.stringify(newUser))
       console.log(err)
-      res.status(400).send('Error while saving user')
+      res.status(400).json({error: err.message})
     } else {
       console.log('Saved user: ' + JSON.stringify(user))
       res.status(201).redirect(301, '/api/user/' + newUser._id)
@@ -52,11 +55,17 @@ exports.updateUser = (req, res) => {
 exports.deleteUser = (req, res) => {
   let id = req.params.id
 
-  User.deleteOne({ _id: id }, (err) => {
+  User.findOneAndDelete({ _id: id }, (err, user) => {
     if (err) {
       console.log('Error while deleting user with ID ' + id)
       console.log(err)
-      res.status(500).send('Error while deleting user')
+      if(err.name === 'CastError') {
+        res.status(400).json({error: 'ID ' + id + ' has wrong format'})
+      } else {
+        res.status(500).json({error: err.message})
+      }
+    } else if (user == null) {
+      res.status(404).json({error: 'User with ID ' + id + ' not found.'}) 
     } else {
       console.log('Deleted user with ID ' + id)
       res.status(204).send()

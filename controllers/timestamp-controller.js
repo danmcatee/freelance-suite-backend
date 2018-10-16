@@ -4,7 +4,9 @@ exports.getTimestamps = (req, res) => {
   Timestamp.find(req.query).exec((err, timestamps) => {
     if (err) {
       console.log(err)
-      res.status(400).send('Error while getting timestamps')
+      res.status(500).json({error: err.message})
+    } else if(timestamps == null) {
+      res.status(404).json({info: 'No timestamps found'})
     } else {
       res.status(200).json(timestamps)
     }
@@ -17,28 +19,15 @@ exports.getTimestamp = (req, res) => {
   Timestamp.findOne({ _id: id }, (err, timestamp) => {
     if (err) {
       console.log(err)
-      res.status(400).send('Error while trying to get timestamp with ID ' + id)
-    }
-    if (timestamp == null) {
-      res.status(404).send('Timestamp with ID ' + id + ' not found.')
+      if(err.name === 'CastError') {
+        res.status(400).json({error: 'ID ' + id + ' has wrong format'})
+      } else {
+        res.status(500).json({error: err.message})
+      }
+    } else if (timestamp == null) {
+      res.status(404).json({error: 'Timestamp with ID ' + id + ' not found.'})
     } else {
       res.status(200).json(timestamp)
-    }
-  })
-}
-
-exports.getTimestampsByTask = (req, res) => {
-  let taskId = req.params.taskId
-
-  Timestamp.find({ taskId: taskId }, (err, timestamps) => {
-    if (err) {
-      console.log(err)
-      res.status(500).send('Error while trying to get timestamp for task with ID ' + taskId)
-    }
-    if (timestamps == null) {
-      res.status(404).send('No timestamp for task with ID ' + taskId + ' found.')
-    } else {
-      res.status(200).json(timestamps)
     }
   })
 }
@@ -50,7 +39,7 @@ exports.addTimestamp = (req, res) => {
     if (err) {
       console.log('Error while saving timestamp: ' + JSON.stringify(newTimestamp))
       console.log(err)
-      res.status(400).send('Error while saving timestamp')
+      res.status(400).json({error: err.message})
     } else {
       console.log('Saved timestamp: ' + JSON.stringify(timestamp))
       res.status(201).redirect(301, '/api/timestamp/' + newTimestamp._id)
@@ -67,11 +56,17 @@ exports.updateTimestamp = (req, res) => {
 exports.deleteTimestamp = (req, res) => {
   let id = req.params.id
 
-  Timestamp.deleteOne({ _id: id }, (err) => {
+  Timestamp.findOneAndDelete({ _id: id }, (err, timestamp) => {
     if (err) {
       console.log('Error while deleting timestamp with ID ' + id)
       console.log(err)
-      res.status(500).send('Error while deleting timestamp')
+      if(err.name === 'CastError') {
+        res.status(400).json({error: 'ID ' + id + ' has wrong format'})
+      } else {
+        res.status(500).json({error: err.message})
+      }
+    } else if (timestamp == null) {
+      res.status(404).json({error: 'Timestamp with ID ' + id + ' not found.'}) 
     } else {
       console.log('Deleted timestamp with ID ' + id)
       res.status(204).send()

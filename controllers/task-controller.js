@@ -4,23 +4,9 @@ exports.getTasks = (req, res) => {
   Task.find(req.query).exec((err, tasks) => {
     if (err) {
       console.log(err)
-      res.status(400).send('Error while getting tasks')
-    } else {
-      res.status(200).json(tasks)
-    }
-  })
-}
-
-exports.getTasksByProject = (req, res) => {
-  let projectId = req.params.projectId
-
-  Task.find({ projectId: projectId }, (err, tasks) => {
-    if (err) {
-      console.log(err)
-      res.status(500).send('Error while trying to get task for project with ID ' + projectId)
-    }
-    if (tasks == null) {
-      res.status(404).send('No task for project with ID ' + projectId + ' found.')
+      res.status(500).json({error: err.message})
+    } else if(tasks == null) {
+      res.status(404).json({info: 'No tasks found'})  
     } else {
       res.status(200).json(tasks)
     }
@@ -34,10 +20,13 @@ exports.getTask = (req, res) => {
   Task.findOne({ _id: id }, (err, task) => {
     if (err) {
       console.log(err)
-      res.status(400).send('Error while trying to get task with ID ' + id)
-    }
-    if (task == null) {
-      res.status(404).send('Task with ID ' + id + ' not found.')
+      if(err.name === 'CastError') {
+        res.status(400).json({error: 'ID ' + id + ' has wrong format'})
+      } else {
+        res.status(500).json({error: err.message})
+      }
+    } else if (task == null) {
+      res.status(404).json({error: 'Task with ID ' + id + ' not found.'})
     } else {
       res.status(200).json(task)
     }
@@ -51,7 +40,7 @@ exports.addTask = (req, res) => {
     if (err) {
       console.log('Error while saving task: ' + JSON.stringify(newTask))
       console.log(err)
-      res.status(400).send('Error while saving task')
+      res.status(400).json({error: err.message})
     } else {
       console.log('Saved task: ' + JSON.stringify(task))
       res.status(201).redirect(301, '/api/task/' + newTask._id)
@@ -68,11 +57,17 @@ exports.updateTask = (req, res) => {
 exports.deleteTask = (req, res) => {
   let id = req.params.id
 
-  Task.deleteOne({ _id: id }, (err) => {
+  Task.findOneAndDelete({ _id: id }, (err, taks) => {
     if (err) {
       console.log('Error while deleting task with ID ' + id)
       console.log(err)
-      res.status(500).send('Error while deleting task')
+      if(err.name === 'CastError') {
+        res.status(400).json({error: 'ID ' + id + ' has wrong format'})
+      } else {
+        res.status(500).json({error: err.message})
+      }
+    } else if(task == null) {
+      res.status(404).json({error: 'Task with ID ' + id + ' not found.'}) 
     } else {
       console.log('Deleted task with ID ' + id)
       res.status(204).send()

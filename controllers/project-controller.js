@@ -4,7 +4,9 @@ exports.getProjects = (req, res) => {
   Project.find(req.query).exec((err, projects) => {
     if (err) {
       console.log(err)
-      res.status(400).send('Error while getting projects')
+      res.status(500).json({error: err.message})
+    } else if(projects == null) {
+      res.send(404).json({info: 'No projects found'})
     } else {
       res.status(200).json(projects)
     }
@@ -18,28 +20,15 @@ exports.getProject = (req, res) => {
   Project.findOne({ _id: id }, (err, project) => {
     if (err) {
       console.log(err)
-      res.status(400).send('Error while trying to get project with ID ' + id)
-    }
-    if (project == null) {
-      res.status(404).send('Project with ID ' + id + ' not found.')
+      if(err.name === 'CastError') {
+        res.status(400).json({error: 'ID ' + id + ' has wrong format'})
+      } else {
+        res.status(500).json({error: err.message})
+      }
+    } else if (project == null) {
+      res.status(404).json({error: 'Project with ID ' + id + ' not found.'})
     } else {
       res.status(200).json(project)
-    }
-  })
-}
-
-exports.getProjectsByCustomer = (req, res) => {
-  let customerId = req.params.customerId
-
-  Project.find({ customerId: customerId}, (err, projects) => {
-    if (err) {
-      console.log(err)
-      res.status(500).send('Error while trying to get project for customer with ID ' + customerId)
-    }
-    if (projects == null) {
-      res.status(404).send('No project for customer with ID ' + customerId+ ' found.')
-    } else {
-      res.status(200).json(projects)
     }
   })
 }
@@ -51,7 +40,7 @@ exports.addProject = (req, res) => {
     if (err) {
       console.log('Error while saving project: ' + JSON.stringify(newProject))
       console.log(err)
-      res.status(400).send('Error while saving project')
+      res.status(400).json({error: err.message})
     } else {
       console.log('Saved project: ' + JSON.stringify(project))
       res.status(201).redirect(301, '/api/project/' + newProject._id)
@@ -68,11 +57,17 @@ exports.updateProject = (req, res) => {
 exports.deleteProject = (req, res) => {
   let id = req.params.id
 
-  Project.deleteOne({ _id: id }, (err) => {
+  Project.findOneAndDelete({ _id: id }, (err, project) => {
     if (err) {
       console.log('Error while deleting project with ID ' + id)
       console.log(err)
-      res.status(500).send('Error while deleting project')
+      if(err.name === 'CastError') {
+        res.status(400).json({error: 'ID ' + id + ' has wrong format'})
+      } else {
+        res.status(500).json({error: err.message})
+      }
+    } else if(project == null) {
+      res.status(404).json({error: 'Project with ID ' + id + ' not found.'}) 
     } else {
       console.log('Deleted project with ID ' + id)
       res.status(204).send()
