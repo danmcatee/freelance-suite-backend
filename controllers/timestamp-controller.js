@@ -47,12 +47,6 @@ exports.addTimestamp = (req, res) => {
   })
 }
 
-exports.updateTimestamp = (req, res) => {
-  let id = req.params.id
-  // TODO
-  res.send('Not yet implemented')
-}
-
 exports.deleteTimestamp = (req, res) => {
   let id = req.params.id
 
