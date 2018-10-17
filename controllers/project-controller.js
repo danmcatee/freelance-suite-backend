@@ -50,8 +50,21 @@ exports.addProject = (req, res) => {
 
 exports.updateProject = (req, res) => {
   let id = req.params.id
-  // TODO
-  res.send('Not yet implemented')
+
+  Project.updateOne({_id: id}, req.body, (err, raw) => {
+    if(err) {
+      console.log('Error while updating project with ID ' + id)
+      console.log(err)
+      if(err.name === 'CastError') {
+        res.status(400).json({error: 'ID ' + id + ' has wrong format'})
+      } else {
+        res.status(400).json({error: err.message})
+      }
+    } else {
+      console.log('Updated ' + raw.nModified + ' document(s)')
+      res.status(204).redirect(301, '/api/project/' + id)
+    }
+  })
 }
 
 exports.deleteProject = (req, res) => {
