@@ -11,9 +11,6 @@ router.get('/:id', timestampController.getTimestamp)
 // add new timestamp
 router.post('/', timestampController.addTimestamp)
 
-// update timestamp
-router.patch('/:id', timestampController.updateTimestamp)
-
 // delete single timestamp by timestamp id
 router.delete('/:id', timestampController.deleteTimestamp)
 
