@@ -8,7 +8,8 @@ const customerRoute = require("./routes/customer");
 const projectRoute = require("./routes/project");
 const taskRoute = require("./routes/task");
 const timestampRoute = require("./routes/timestamp");
-const middleware = require("./controllers/middleware");
+const statisticsRoute = require("./routes/statistics")
+const middleware = require("./controllers/middleware")
 const cors = require("cors");
 
 let dbCon = projectProps.databaseConnection;
@@ -54,6 +55,7 @@ app.use("/api/customer", customerRoute);
 app.use("/api/project", projectRoute);
 app.use("/api/task", taskRoute);
 app.use("/api/timestamp", timestampRoute);
+app.use("/api/stats", statisticsRoute);
 
 // listen for requests
 app.listen(port, () => {
