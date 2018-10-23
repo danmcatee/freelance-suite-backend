@@ -1,7 +1,37 @@
 const Timestamp = require('../models/timestamp')
 
+
+/**
+ * Return timestamps, optionally filtered by given URL parameters.
+ * URL parameters: 
+ * 1. taskId: a task ID [optional]
+ * 2. start: min. date of start timestamps [optional]
+ * 3. end: max. date of end timestamps [optional]
+ * 
+ * example URL: /api/timestamp?taskId=5bb0cd1caeca2d21a5eabc34&start=2018-09-10
+ */
 exports.getTimestamps = (req, res) => {
-  Timestamp.find(req.query).exec((err, timestamps) => {
+  let dbQuery = {}
+  for(let param in req.query) {
+    
+    if(req.query.hasOwnProperty(param)) {
+      // TODO param names as constants
+      if(param === 'taskId') {
+        dbQuery[param] = req.query[param]
+      } 
+      else if(param === 'start') { // TODO catch parsing errors
+        dbQuery['timestamp'] = { $gte : new Date(req.query[param]) }
+        dbQuery['isStart'] = true
+      } 
+      else if(param === 'end') {
+        dbQuery['timestamp'] = { $lte : new Date(req.query[param]) }
+        dbQuery['isStart'] = false
+      } 
+    }
+  }
+  console.log('DB query: ' + JSON.stringify(dbQuery))
+  
+  Timestamp.find(dbQuery).exec((err, timestamps) => {
     if (err) {
       console.log(err)
       res.status(500).json({error: err.message})
