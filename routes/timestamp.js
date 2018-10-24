@@ -14,4 +14,7 @@ router.post('/', timestampController.addTimestamp)
 // delete single timestamp by timestamp id
 router.delete('/:id', timestampController.deleteTimestamp)
 
+// delete all timestamps
+router.delete('/', timestampController.deleteAllTimestamps)
+
 module.exports = router

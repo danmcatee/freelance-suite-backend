@@ -97,3 +97,15 @@ exports.deleteTimestamp = (req, res) => {
     }
   })
 }
+
+exports.deleteAllTimestamps = (req, res) => {
+  Timestamp.deleteMany({}, (err) => {
+    if (err) {
+      console.log('Error while deleting timestamps')
+      console.log(err)
+      res.status(500).json({error: err.message})
+    } else {
+      res.status(204).send()
+    }
+  })
+}
