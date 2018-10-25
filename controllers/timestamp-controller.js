@@ -21,11 +21,9 @@ exports.getTimestamps = (req, res) => {
       } 
       else if(param === 'start') { // TODO catch parsing errors
         dbQuery['timestamp'] = { $gte : new Date(req.query[param]) }
-        dbQuery['isStart'] = true
       } 
       else if(param === 'end') {
         dbQuery['timestamp'] = { $lte : new Date(req.query[param]) }
-        dbQuery['isStart'] = false
       } 
     }
   }
