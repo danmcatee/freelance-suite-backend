@@ -60,7 +60,16 @@ exports.calculateTotalTimeSpent = (req, res) => {
  * example URL: 
  */
 exports.calculateAvgTimeSpent = (req, res) => {
-
+  Timestamp.find(dbQuery, null, {sort: {timestamp: 'asc'}}).exec((err, timestamps) => {
+    if (err) {
+      console.log(err)
+      res.status(500).json({error: err.message})
+    } else if(timestamps == null) {
+      res.status(200).json({totaltime : 0})
+    } else {
+      res.status(200).json({totaltime: statsHelper.calculateAverageTime(timestamps, start, end)})
+    }
+  })
 }
 
 
