@@ -1,7 +1,7 @@
 /**
  * Currently ignores timespans that have no end timestamps (--> TODO)
  */
-exports.calculateTotalTime = (timestamps, start, end) => { 
+function calculateTotalTime(timestamps, start, end) { 
   if(timestamps) {
     let totalTime = 0;
     if(timestamps.length === 1) {
@@ -20,10 +20,10 @@ exports.calculateTotalTime = (timestamps, start, end) => {
         totalTime += Math.abs(timestamps[i].timestamp.getTime() - start.getTime())
       }
 
-      if(end && i == timestamps.length-1 && !timestamps[i].startId) {
+      if(end && i == timestamps.length-2 && !timestamps[i+1].startId) {
         // last timespan ends after 'end' date
         // --> get time differance between this timestamp and 'end' date
-        totalTime += Math.abs(end.getTime() - timestamps[i].timestamp.getTime())
+        totalTime += Math.abs(end.getTime() - timestamps[i+1].timestamp.getTime())
       }
 
       // get time difference for each timespan 
@@ -32,8 +32,18 @@ exports.calculateTotalTime = (timestamps, start, end) => {
         totalTime += Math.abs(timestamps[i+1].timestamp.getTime() - timestamps[i].timestamp.getTime())
       }
     }
-
     return Math.round(totalTime / (1000 * 60)) // convert millisec to minutes
   }
   return 0;
 }
+
+function calculateAverageTime(timestamps, start, end, unit) { 
+  let totalTime = calculateTotalTime(timestamps, start, end)
+  let average;
+
+  // TODO
+}
+
+
+exports.calculateTotalTime = calculateTotalTime
+exports.calculateAverageTime = calculateAverageTime
