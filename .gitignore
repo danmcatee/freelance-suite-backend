@@ -6,3 +6,5 @@ config/project-properties.json
 
 # For playing around with new features
 playground/
+
+.vscode/
