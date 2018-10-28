@@ -4,11 +4,9 @@ const Timestamp = require('../models/timestamp')
 /**
  * Return timestamps, optionally filtered by given URL parameters.
  * URL parameters: 
- * 1. taskId: a task ID [optional]
- * 2. start: min. date of start timestamps [optional]
- * 3. end: max. date of end timestamps [optional]
- * 
- * example URL: /api/timestamp?taskId=5bb0cd1caeca2d21a5eabc34&start=2018-09-10
+ * 1. taskId: only timestamps for this task [optional]
+ * 2. start: only timestamps after this date [optional]
+ * 3. end: only timestamps before this date [optional]
  */
 exports.getTimestamps = (req, res) => {
   let dbQuery = {}
@@ -19,11 +17,20 @@ exports.getTimestamps = (req, res) => {
       if(param === 'taskId') {
         dbQuery[param] = req.query[param]
       } 
-      else if(param === 'start') { // TODO catch parsing errors
-        dbQuery['timestamp'] = { $gte : new Date(req.query[param]) }
-      } 
-      else if(param === 'end') {
-        dbQuery['timestamp'] = { $lte : new Date(req.query[param]) }
+      else if(param === 'start') {
+        let date = new Date(req.query[param])
+        if(date instanceof Date && !isNaN(date)) {
+          dbQuery['timestamp'] = { $gte : date }
+        } else {
+          console.log(`Not able to parse start date ${req.query[param]}`)
+        } 
+      } else if(param === 'end') {
+        let date = new Date(req.query[param])
+        if(date instanceof Date && !isNaN(date)) {
+          dbQuery['timestamp'] = { $lte : date }
+        } else {
+          console.log(`Not able to parse end date ${req.query[param]}`)
+        } 
       } 
     }
   }
@@ -32,11 +39,11 @@ exports.getTimestamps = (req, res) => {
   Timestamp.find(dbQuery).exec((err, timestamps) => {
     if (err) {
       console.log(err)
-      res.status(500).json({error: err.message})
-    } else if(timestamps == null) {
-      res.status(404).json({info: 'No timestamps found'})
-    } else {
+      res.status(500).json({error: err.message}) 
+    } else if(timestamps) {
       res.status(200).json(timestamps)
+    } else {
+      res.status(400)
     }
   })
 }
