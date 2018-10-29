@@ -1,5 +1,6 @@
 const Timestamp = require('../models/timestamp');
 const statsHelper = require('../helper/statistics-helper')
+const consts = require('../helper/constants')
 
 
 /**
@@ -59,17 +60,16 @@ function parseUrlParameter(urlParams) {
 
   let foundFilterByParam = false
   let start, end, unit = 'week'
-  const timeUnits = new Set(['day', 'week', 'month', 'year'])
 
   for (let param in urlParams) {
     if (urlParams.hasOwnProperty(param)) {
       // TODO param names as constants
-      if (!foundFilterByParam && param === 'taskId') {
+      if (!foundFilterByParam && param === consts.ATTR_TASK_ID) {
         params[param] = urlParams[param]
         foundFilterByParam = true
       }
 
-      if (param === 'start') {
+      if (param === consts.PARAM_START) {
         start = new Date(urlParams[param])
         if (start instanceof Date && !isNaN(start)) {
           params[param] = start
@@ -77,7 +77,7 @@ function parseUrlParameter(urlParams) {
           console.log(`Not able to parse start date ${urlParams[param]}`)
         }
       }
-      else if (param === 'end') {
+      else if (param === consts.PARAM_END) {
         end = new Date(urlParams[param])
         if (end instanceof Date && !isNaN(end)) {
           params[param] = end
@@ -85,8 +85,8 @@ function parseUrlParameter(urlParams) {
           console.log(`Not able to parse end date ${urlParams[param]}`)
         }
       }
-      else if (param === 'unit') {
-        if(timeUnits.has(urlParams[param])) {
+      else if (param === consts.PARAM_UNIT) {
+        if(consts.TIME_UNITS.has(urlParams[param])) {
           params[param] = urlParams[param]
         }
       }
@@ -102,14 +102,14 @@ function createDbQuery(params) {
 
   for(param in params) {
     if(params.hasOwnProperty(param)) {
-      if (param === 'taskId') {
+      if (param === consts.ATTR_TASK_ID) {
         dbQuery[param] = params[param]
       }
-      else if (param === 'start') {
-        dbQuery['timestamp'] = { $gte: params[param] }
+      else if (param === consts.PARAM_START) {
+        dbQuery[consts.ATTR_TIMESTAMP] = { $gte: params[param] }
       }
-      else if (param === 'end') {
-        dbQuery['timestamp'] = { $lte: params[param] }
+      else if (param === consts.PARAM_END) {
+        dbQuery[consts.ATTR_TIMESTAMP] = { $lte: params[param] }
       }
     }
   }
