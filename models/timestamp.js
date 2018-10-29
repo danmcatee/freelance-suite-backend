@@ -10,7 +10,7 @@ const Schema = mongoose.Schema
 const TimestampSchema = new Schema({
   startId: { type: Schema.Types.ObjectId },
   timestamp: { type: Date, required: true, default: Date.now },
-  taskId: { type: Schema.Types.ObjectId, required: true }
+  taskId: { type: Schema.Types.ObjectId, required: true, ref: 'Task' }
 })
 
 module.exports = mongoose.model('Timestamp', TimestampSchema)
