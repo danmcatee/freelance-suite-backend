@@ -9,44 +9,21 @@ const statsHelper = require('../helper/statistics-helper')
  *    (if > 1 given, the first one will be evaluated)
  * 2. start date [optional]
  * 3. end date [optional]
- * 4. unit [optional] TODO
  */
-exports.calculateTotalTimeSpent = (req, res) => {   
-    let foundFilterByParam = false
-    let dbQuery = {}
-    let start, end
+exports.calculateTotalTimeSpent = (req, res) => {
+  let params = parseUrlParameter(req.query)
+  let dbQuery = createDbQuery(params)
 
-    //parse URL parameter
-    for(let param in req.query) {
-      if(req.query.hasOwnProperty(param)) {
-        // TODO param names as constants
-        if(!foundFilterByParam && param === 'taskId') {
-          dbQuery[param] = req.query[param]
-          foundFilterByParam = true
-        } 
-
-        if(param === 'start') {
-          start = new Date(req.query[param])
-          if(start instanceof Date && !isNaN(start)) dbQuery['timestamp'] = { $gte : start }
-        } 
-        else if(param === 'end') { 
-          end = new Date(req.query[param])
-          if(end instanceof Date && !isNaN(end)) dbQuery['timestamp'] = { $lte : end }
-        } 
-      }
+  Timestamp.find(dbQuery, null, { sort: { timestamp: 'asc' } }).exec((err, timestamps) => {
+    if (err) {
+      console.log(err)
+      res.status(500).json({ error: err.message })
+    } else if (timestamps == null || timestamps.length === 0) {
+      res.status(200).json({ totaltime: 0 })
+    } else {
+      res.status(200).json({ totaltime: statsHelper.calculateTotalTime(timestamps, params.start, params.end) })
     }
-    console.log(`DB query: ${JSON.stringify(dbQuery)}`)
-  
-    Timestamp.find(dbQuery, null, {sort: {timestamp: 'asc'}}).exec((err, timestamps) => {
-      if (err) {
-        console.log(err)
-        res.status(500).json({error: err.message})
-      } else if(timestamps == null) {
-        res.status(200).json({totaltime : 0})
-      } else {
-        res.status(200).json({totaltime: statsHelper.calculateTotalTime(timestamps, start, end)})
-      }
-    })
+  })
 }
 
 /**
@@ -57,19 +34,86 @@ exports.calculateTotalTimeSpent = (req, res) => {
  * 3. start date [optional]
  * 4. end date [optional]
  * 
- * example URL: 
+ * If no start/end date given the start date of first timestamp is taken
+ * (TODO order timestamps by timedate)
  */
-exports.calculateAvgTimeSpent = (req, res) => {
+exports.calculateAvgTimeSpent = (req, res) => {  
+  let params = parseUrlParameter(req.query)
+  let dbQuery = createDbQuery(params)
+  
+
   Timestamp.find(dbQuery, null, {sort: {timestamp: 'asc'}}).exec((err, timestamps) => {
     if (err) {
       console.log(err)
       res.status(500).json({error: err.message})
-    } else if(timestamps == null) {
-      res.status(200).json({totaltime : 0})
+    } else if(timestamps == null || timestamps.length === 0) {
+      res.status(200).json({avgtime : 0})
     } else {
-      res.status(200).json({totaltime: statsHelper.calculateAverageTime(timestamps, start, end)})
+      res.status(200).json({avgtime: statsHelper.calculateAverageTime(timestamps, params.start, params.end, params.unit)})
     }
   })
 }
 
+function parseUrlParameter(urlParams) {
+  let params = {}
+
+  let foundFilterByParam = false
+  let start, end, unit = 'week'
+  const timeUnits = new Set(['day', 'week', 'month', 'year'])
+
+  for (let param in urlParams) {
+    if (urlParams.hasOwnProperty(param)) {
+      // TODO param names as constants
+      if (!foundFilterByParam && param === 'taskId') {
+        params[param] = urlParams[param]
+        foundFilterByParam = true
+      }
+
+      if (param === 'start') {
+        start = new Date(urlParams[param])
+        if (start instanceof Date && !isNaN(start)) {
+          params[param] = start
+        } else {
+          console.log(`Not able to parse start date ${urlParams[param]}`)
+        }
+      }
+      else if (param === 'end') {
+        end = new Date(urlParams[param])
+        if (end instanceof Date && !isNaN(end)) {
+          params[param] = end
+        } else {
+          console.log(`Not able to parse end date ${urlParams[param]}`)
+        }
+      }
+      else if (param === 'unit') {
+        if(timeUnits.has(urlParams[param])) {
+          params[param] = urlParams[param]
+        }
+      }
+    }
+  }
+  console.log(`Parsed URL parameters: ${JSON.stringify(params)}`)
+  return params
+
+}
+
+function createDbQuery(params) {
+  let dbQuery = {}
+
+  for(param in params) {
+    if(params.hasOwnProperty(param)) {
+      if (param === 'taskId') {
+        dbQuery[param] = params[param]
+      }
+      else if (param === 'start') {
+        dbQuery['timestamp'] = { $gte: params[param] }
+      }
+      else if (param === 'end') {
+        dbQuery['timestamp'] = { $lte: params[param] }
+      }
+    }
+  }
+  console.log(`DB query: ${JSON.stringify(dbQuery)}`)
+  return dbQuery
+}
 
